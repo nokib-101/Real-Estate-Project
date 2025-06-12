@@ -31,7 +31,7 @@ def contact(request):
         '''send_mail(
             'Property Listing Inquiry',
             'There has been an inquiry for ' + listing + '. Sign into the admin panel for more info',
-            'shahedparvez101@gmail.com', [realtor_email,'shahed.pervez.nokib@g.bracu.ac.bd'],
+            'dummy101@gmail.com', [realtor_email,],
             fail_silently=False
         )'''
 
