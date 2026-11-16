@@ -238,3 +238,25 @@ class CloudinaryStorageTests(TestCase):
             self.assertEqual(s.STORAGES['default']['BACKEND'], 'btre.storage.MediaStorage')
         importlib.reload(s)
         self.assertEqual(s.STORAGES['default']['BACKEND'], 'django.core.files.storage.FileSystemStorage')
+
+
+class CloudinaryUrlSettingTests(TestCase):
+    def test_clean_accepts_copy_paste_variants(self):
+        from btre.settings import _clean_cloudinary_url as clean
+        good = 'cloudinary://111:abc@demo'
+        for raw in (good, f' {good} ', f'"{good}"', f"'{good}'", f'CLOUDINARY_URL={good}', f'CLOUDINARY_URL="{good}"'):
+            self.assertEqual(clean(raw), good, raw)
+        for raw in ('', 'https://example.com', 'my-api-key', 'cloudinary://no-cloud-name'):
+            self.assertEqual(clean(raw), '', raw)
+
+    def test_invalid_value_falls_back_to_local_storage_instead_of_crashing(self):
+        import importlib
+        import os
+        import btre.settings as s
+        with mock.patch.dict('os.environ', {'CLOUDINARY_URL': 'CLOUDINARY_URL=https://oops'}), \
+                mock.patch('sys.stderr', new_callable=io.StringIO) as stderr:
+            importlib.reload(s)
+            self.assertEqual(s.STORAGES['default']['BACKEND'], 'django.core.files.storage.FileSystemStorage')
+            self.assertNotIn('CLOUDINARY_URL', os.environ)  # so the Cloudinary SDK can still be imported
+            self.assertIn('CLOUDINARY_URL is set but not valid', stderr.getvalue())
+        importlib.reload(s)
