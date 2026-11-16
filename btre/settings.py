@@ -97,7 +97,8 @@ WSGI_APPLICATION = 'btre.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# On Render, DATABASE_URL points at the connected Postgres database.
+# In production, DATABASE_URL is the Neon Postgres connection string (SSL
+# options such as sslmode=require are taken from the URL).
 # Locally, set DB_ENGINE=sqlite to run without PostgreSQL (e.g. for tests).
 if os.getenv('DATABASE_URL'):
     DATABASES = {'default': dj_database_url.parse(os.environ['DATABASE_URL'], conn_max_age=600, conn_health_checks=True)}
