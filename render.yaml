@@ -1,10 +1,7 @@
-# Render Blueprint: a free Django web service and the free Postgres database
-# it connects to. In Render: New > Blueprint > pick this repository.
-databases:
-  - name: btre-db
-    plan: free
-    databaseName: btredb
-    user: btre
+# Render Blueprint: a free Django web service. The database is a free Neon
+# Postgres (neon.tech), which doesn't expire like Render's free database.
+# In Render: New > Blueprint > pick this repository; when asked, paste the
+# Neon connection string as DATABASE_URL.
 
 services:
   - type: web
@@ -18,10 +15,9 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.8
+      # Neon connection string, e.g. postgresql://user:pass@ep-xxx.region.aws.neon.tech/neondb?sslmode=require
       - key: DATABASE_URL
-        fromDatabase:
-          name: btre-db
-          property: connectionString
+        sync: false
       - key: SECRET_KEY
         generateValue: true
       - key: DEBUG
