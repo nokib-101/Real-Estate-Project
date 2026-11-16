@@ -14,7 +14,7 @@ def index(request):
         'listings': listings,
         'listing_count': published.count(),
         'city_count': published.values('city').distinct().count(),
-        'realtor_count': Realtor.objects.count(),
+        'realtor_count': Realtor.objects.filter(is_approved=True).count(),
         'top_cities': published.values_list('city', flat=True).distinct().order_by('city')[:6],
         'state_choices': state_choices,
         'bedroom_choices': bedroom_choices,
@@ -25,10 +25,10 @@ def index(request):
 
 def about(request):
     # get all realtors 
-    realtors = Realtor.objects.order_by('-hire_date')
+    realtors = Realtor.objects.filter(is_approved=True).order_by('-hire_date')
 
     # set mvp 
-    mvp_realtors = Realtor.objects.all().filter(is_mvp=True)
+    mvp_realtors = Realtor.objects.filter(is_approved=True, is_mvp=True)
 
     context = {
         'realtors': realtors,

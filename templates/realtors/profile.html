@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Your profile{% endblock %}
+
+{% block content %}
+  {% include 'realtors/_portal_head.html' with tab='profile' %}
+
+  <section class="section-sm">
+    <div class="container" style="max-width: 720px;">
+      <form method="POST" enctype="multipart/form-data" class="form-section" novalidate>
+        {% csrf_token %}
+        <h2>Public profile</h2>
+        <p class="text-muted small">Shown on your listings and on the About page. Buyers' inquiries are sent to your email address.</p>
+        {% include 'realtors/_field.html' with field=form.name %}
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6">{% include 'realtors/_field.html' with field=form.phone wrapper_class='' %}</div>
+          <div class="col-sm-6">{% include 'realtors/_field.html' with field=form.email wrapper_class='' %}</div>
+        </div>
+        {% include 'realtors/_field.html' with field=form.description %}
+        <div class="d-flex align-items-center gap-3 mb-4">
+          <img src="{{ realtor.photo.url }}" alt="Current photo" class="avatar" style="width: 72px; height: 72px;">
+          <div class="flex-grow-1">
+            <label class="form-label" for="{{ form.photo.id_for_label }}">Profile photo</label>
+            <input type="file" name="{{ form.photo.html_name }}" id="{{ form.photo.id_for_label }}" accept="image/*" class="form-control">
+            {% for error in form.photo.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Save profile</button>
+      </form>
+    </div>
+  </section>
+{% endblock %}

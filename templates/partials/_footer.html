@@ -22,6 +22,11 @@
             <li><a href="{% url 'login' %}">Log in</a></li>
             <li><a href="{% url 'register' %}">Sign up</a></li>
           {% endif %}
+          {% if user.realtor_profile %}
+            <li><a href="{% url 'realtor_portal' %}">Realtor portal</a></li>
+          {% else %}
+            <li><a href="{% url 'realtor_register' %}">Join as a realtor</a></li>
+          {% endif %}
         </ul>
       </div>
       <div class="col-lg-3">

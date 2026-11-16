@@ -1,0 +1,14 @@
+{# Renders one form field with label, hint and errors. Expects `field`. #}
+<div class="{{ wrapper_class|default:'mb-3' }}">
+  {% if field.widget_type == 'checkbox' %}
+    <div class="form-check form-switch">
+      {{ field }}
+      <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    </div>
+  {% else %}
+    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}{% if not field.field.required %} <span class="text-muted fw-normal">(optional)</span>{% endif %}</label>
+    {{ field }}
+  {% endif %}
+  {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+  {% for error in field.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+</div>

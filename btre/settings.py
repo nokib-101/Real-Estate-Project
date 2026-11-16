@@ -161,9 +161,12 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS =[
     os.path.join(BASE_DIR,'btre/static')
 ]
-# WhiteNoise serves static files in production; compressed + cache-busted
+# WhiteNoise serves static files in production; compressed + cache-busted.
+# With CLOUDINARY_URL set (cloudinary://key:secret@cloud-name), uploaded
+# photos are stored on Cloudinary so they survive restarts (btre/storage.py).
 STORAGES = {
-    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'default': {'BACKEND': 'btre.storage.MediaStorage' if os.getenv('CLOUDINARY_URL')
+                else 'django.core.files.storage.FileSystemStorage'},
     'staticfiles': {
         'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'
         if not DEBUG else 'django.contrib.staticfiles.storage.StaticFilesStorage',
@@ -211,3 +214,6 @@ LOGGING = {
 }
 
 LOGIN_URL = 'login'
+
+# Largest photo a realtor may upload
+MAX_UPLOAD_PHOTO_MB = 5

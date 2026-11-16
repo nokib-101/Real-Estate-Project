@@ -11,16 +11,24 @@
     <div class="collapse navbar-collapse" id="mainNav">
       <ul class="navbar-nav ms-lg-4 me-auto">
         <li class="nav-item"><a class="nav-link {% if path == '/' %}active{% endif %}" href="{% url 'index' %}">Home</a></li>
-        <li class="nav-item"><a class="nav-link {% if '/listings' in path %}active{% endif %}" href="{% url 'listings' %}">Listings</a></li>
+        <li class="nav-item"><a class="nav-link {% if '/listings' in path and '/realtor' not in path %}active{% endif %}" href="{% url 'listings' %}">Listings</a></li>
         <li class="nav-item"><a class="nav-link {% if '/about' in path %}active{% endif %}" href="{% url 'about' %}">About</a></li>
       </ul>
       <ul class="navbar-nav align-items-lg-center gap-lg-1">
         {% if user.is_authenticated %}
-          <li class="nav-item">
-            <a class="nav-link user-chip {% if 'dashboard' in path %}active{% endif %}" href="{% url 'dashboard' %}">
-              <span class="avatar">{{ user.first_name|default:user.username|first|upper }}</span> Dashboard
-            </a>
-          </li>
+          {% if user.realtor_profile %}
+            <li class="nav-item">
+              <a class="nav-link user-chip {% if '/realtor' in path %}active{% endif %}" href="{% url 'realtor_portal' %}">
+                <span class="avatar">{{ user.first_name|default:user.username|first|upper }}</span> Realtor portal
+              </a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link user-chip {% if 'dashboard' in path %}active{% endif %}" href="{% url 'dashboard' %}">
+                <span class="avatar">{{ user.first_name|default:user.username|first|upper }}</span> Dashboard
+              </a>
+            </li>
+          {% endif %}
           <li class="nav-item">
             <form action="{% url 'logout' %}" method="POST" class="m-0">
               {% csrf_token %}
