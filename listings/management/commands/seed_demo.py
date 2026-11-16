@@ -55,6 +55,20 @@ LISTINGS = [
 ]
 
 
+# Approximate map positions for the demo listings (neighbourhood level)
+COORDINATES = {
+    'Modern Villa with Infinity Pool': ('25.782600', '-80.134100'),
+    'Craftsman Home with Mountain View': ('40.017600', '-105.279700'),
+    'Classic Home with Wraparound Porch': ('32.776500', '-79.931100'),
+    'Contemporary Hillside Residence': ('34.103000', '-118.364000'),
+    'Coastal Family Home with Pool': ('32.797700', '-117.240000'),
+    'Charming Country Cottage': ('43.659100', '-70.256800'),
+    'Brick Two-Story with Double Garage': ('30.244000', '-97.771000'),
+    'Minimalist Pool House': ('33.494200', '-111.926100'),
+    'Urban Modern Townhouse': ('47.610100', '-122.342100'),
+}
+
+
 class Command(BaseCommand):
     help = 'Load demo realtors and listings (only into an empty database) and create the admin user from env vars.'
 
@@ -64,6 +78,7 @@ class Command(BaseCommand):
             self.stdout.write('Listings already exist; demo data not loaded.')
         else:
             self.load_demo_data()
+        self.fill_coordinates()
         self.ensure_superuser()
 
     def copy_demo_media(self):
@@ -88,6 +103,12 @@ class Command(BaseCommand):
                 **photos,
             )
         self.stdout.write(self.style.SUCCESS(f'Loaded {len(REALTORS)} realtors and {len(LISTINGS)} listings.'))
+
+    def fill_coordinates(self):
+        # Also covers databases seeded before listings had map coordinates
+        for title, (lat, lng) in COORDINATES.items():
+            Listing.objects.filter(title=title, latitude__isnull=True).update(
+                latitude=Decimal(lat), longitude=Decimal(lng))
 
     def ensure_superuser(self):
         username = os.getenv('DJANGO_SUPERUSER_USERNAME')

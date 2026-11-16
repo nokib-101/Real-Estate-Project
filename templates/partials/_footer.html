@@ -1,5 +1,38 @@
-    <!-- Footer -->
-    <footer id="main-footer" class="py-4 bg-primary text-white text-center">
-        Copyright &copy;
-        <span class="year"></span> BT Real Estate
-    </footer>
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <a class="brand mb-3" href="{% url 'index' %}"><span class="brand-mark"><i class="fas fa-home"></i></span> BT Real Estate</a>
+        <p class="mt-3 mb-0" style="max-width: 360px;">Find a home you'll love. Browse listings, explore the neighbourhood on the map, estimate your monthly payment and talk to a realtor.</p>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="{% url 'listings' %}">All listings</a></li>
+          <li><a href="{% url 'search' %}">Search</a></li>
+          <li><a href="{% url 'about' %}">Our realtors</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h4>Account</h4>
+        <ul>
+          {% if user.is_authenticated %}
+            <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+          {% else %}
+            <li><a href="{% url 'login' %}">Log in</a></li>
+            <li><a href="{% url 'register' %}">Sign up</a></li>
+          {% endif %}
+        </ul>
+      </div>
+      <div class="col-lg-3">
+        <h4>About this demo</h4>
+        <p class="mb-2">A Django portfolio project by Shahed Pervez Nokib.</p>
+        <a href="https://github.com/nokib-101/Real-Estate-Project" target="_blank" rel="noopener"><i class="fab fa-github me-1"></i> View the source</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; <span class="year"></span> BT Real Estate. Demo listings and realtors are fictional.</span>
+      <span>Photos: <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a> · Maps: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></span>
+    </div>
+  </div>
+</footer>

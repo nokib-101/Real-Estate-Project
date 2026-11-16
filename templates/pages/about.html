@@ -1,95 +1,79 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %} | About Us {% endblock %}
+{% block title %}About us{% endblock %}
 
 {% block content %}
-
-<!-- Breadcrumb -->
-<section id="bc" class="mt-3">
+  <section class="page-head">
     <div class="container">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item">
-            <a href="{% url 'index' %}">
-              <i class="fas fa-home"></i> Home</a>
-          </li>
-          <li class="breadcrumb-item active"> About</li>
-        </ol>
-      </nav>
+      <div class="crumbs"><a href="{% url 'index' %}">Home</a> / About</div>
+      <h1>About BT Real Estate</h1>
+      <p class="text-muted mb-0 mt-1">Who we are and how we help buyers and sellers</p>
     </div>
   </section>
 
-  <section id="about" class="py-4">
+  <!-- Story -->
+  <section class="section">
     <div class="container">
-      <div class="row">
-        <div class="col-md-8">
-          <h2>We Search For The Perfect Home</h2>
-          <p class="lead">Find out who we are and how we help buyers and sellers</p>
-          <img src="{% static 'img/about.jpg' %}" alt="">
-          <p class="mt-4">BT Real Estate connects buyers with homes that fit the way they live. Our realtors know their
-            neighbourhoods inside out, and every listing is presented with clear details, honest pricing and plenty of
-            photos, so you can shortlist with confidence before you ever book a viewing.</p>
+      <div class="row g-4 g-lg-5 align-items-center">
+        <div class="col-lg-6">
+          <img src="{% static 'img/about.jpg' %}" alt="A bright family home" class="story-img">
         </div>
-        <div class="col-md-4">
-          {% if mvp_realtors %}
-            {% for realtor in mvp_realtors %}
-             <div class="card">
-                <img class="card-img-top" src="{{ realtor.photo.url }}" alt="Seller of the month">
-                <div class="card-body">
-                  <h5 class="card-title">Seller Of The Month</h5>
-                  <h6 class="text-secondary">{{ realtor.name }}</h6>
-                  <p class="card-text"> {{ realtor.description }}
-                  </p>
-                </div>
-              </div>
-
-            {% endfor %}
-
-          {% endif %}
+        <div class="col-lg-6">
+          <span class="eyebrow">Our story</span>
+          <h2 class="section-title mt-2">We search for the perfect home, so you don't have to</h2>
+          <p class="text-muted mt-3">BT Real Estate connects buyers with homes that fit the way they live. Our realtors know their neighbourhoods inside out, and every listing is presented with clear details, honest pricing and plenty of photos, so you can shortlist with confidence before you ever book a viewing.</p>
+          <div class="row g-3 mt-2">
+            <div class="col-sm-6"><div class="feature"><div class="icon"><i class="fas fa-handshake"></i></div><h3>Local expertise</h3><p>Realtors who live and work in the areas they sell.</p></div></div>
+            <div class="col-sm-6"><div class="feature"><div class="icon"><i class="fas fa-tags"></i></div><h3>Transparent pricing</h3><p>Every listing shows the full price and key facts up front.</p></div></div>
+          </div>
         </div>
       </div>
     </div>
-  </section>
-
-  <!-- Work -->
-  <section id="work" class="bg-dark text-white text-center">
-    <h2 class="display-4">We Work For You</h2>
-    <h4>Local expertise, transparent pricing and a realtor who answers your questions</h4>
-    <hr>
-    <a href="{% url 'listings' %}" class="btn btn-secondary text-white btn-lg">View Our Featured Listings</a>
   </section>
 
   <!-- Team -->
-  <section id="team" class="py-5">
+  <section class="section bg-canvas">
     <div class="container">
-      <h2 class="text-center">Our Team</h2>
-      <div class="row text-center">
-        {% if realtors %}
-          {% for realtor in realtors %}
-            <div class="col-md-4">
-              <img src="{{ realtor.photo.url }}" alt="" class="rounded-circle mb-3">
-              <h4>{{ realtor.name }}</h4>
-              <p class="text-success">
-                <i class="fas fa-award text-success mb-3"></i> Realtor</p>
-              <hr>
-              <p>
-                <i class="fas fa-phone"></i> {{ realtor.phone }}</p>
-              <p>
-                <i class="fas fa-envelope-open"></i> {{ realtor.email }}</p>
+      <div class="text-center">
+        <span class="eyebrow">Our team</span>
+        <h2 class="section-title mt-2">Meet our realtors</h2>
+        <p class="section-sub">Here to answer your questions, from the first viewing to closing day</p>
+      </div>
+      <div class="row g-4 justify-content-center">
+        {% for realtor in realtors %}
+          <div class="col-sm-6 col-lg-4">
+            <div class="team-card">
+              <img src="{{ realtor.photo.url }}" alt="{{ realtor.name }}">
+              <h3 class="h5 mb-1">{{ realtor.name }}</h3>
+              {% if realtor.is_mvp %}
+                <span class="mvp-badge mb-2"><i class="fas fa-award"></i> Realtor of the month</span>
+              {% else %}
+                <div class="text-muted small mb-2">Realtor</div>
+              {% endif %}
+              {% if realtor.description %}<p class="text-muted small">{{ realtor.description }}</p>{% endif %}
+              <div class="d-flex justify-content-center gap-2 mt-3 flex-wrap">
+                <a href="tel:{{ realtor.phone }}" class="btn btn-light btn-sm"><i class="fas fa-phone me-1"></i>{{ realtor.phone }}</a>
+                <a href="mailto:{{ realtor.email }}" class="btn btn-light btn-sm"><i class="fas fa-envelope me-1"></i>Email</a>
+              </div>
             </div>
-
-          {% endfor %}
-        {% else %}
-          <div class ="col-md-12"
-            <p> No Realtors Available</p> 
           </div>
-
-        {% endif %}
+        {% empty %}
+          <div class="col-12"><div class="empty-state"><div class="icon"><i class="fas fa-user-tie"></i></div><h3 class="h5 mb-0">No realtors yet</h3></div></div>
+        {% endfor %}
       </div>
     </div>
   </section>
 
-
+  <section class="section pb-0">
+    <div class="container">
+      <div class="cta-band">
+        <div>
+          <h2>We work for you</h2>
+          <p>Local expertise, transparent pricing and a realtor who answers your questions.</p>
+        </div>
+        <a href="{% url 'listings' %}" class="btn btn-primary btn-lg">View listings</a>
+      </div>
+    </div>
+  </section>
 {% endblock %}
-

@@ -6,6 +6,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.utils.http import url_has_allowed_host_and_scheme
 from contacts.models import Contact
+from listings.models import Listing
 
 
 User = get_user_model()
@@ -83,8 +84,16 @@ def logout(request):
 
 @login_required
 def dashboard(request):
-    user_contacts = Contact.objects.order_by('-contact_date').filter(user_id=request.user.id)
+    user_contacts = list(Contact.objects.order_by('-contact_date').filter(user_id=request.user.id))
+    # Attach each inquiry's listing (if it's still published) for photos and details
+    listings = Listing.objects.filter(id__in=[c.listing_id for c in user_contacts], is_published=True).select_related('realtor')
+    by_id = {listing.id: listing for listing in listings}
+    for contact in user_contacts:
+        contact.listing_obj = by_id.get(contact.listing_id)
+    recommended = (Listing.objects.filter(is_published=True).exclude(id__in=by_id)
+                   .select_related('realtor').order_by('-list_date')[:3])
     context = {
-        'contacts': user_contacts
+        'contacts': user_contacts,
+        'recommended': recommended,
     }
     return render(request, 'accounts/dashboard.html', context)

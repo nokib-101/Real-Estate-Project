@@ -1,160 +1,122 @@
 {% extends 'base.html' %}
-{% load humanize %}
 
-{% block title %} | Welcome {% endblock %}
+{% block title %}Find a home you'll love{% endblock %}
 
 {% block content %}
-  <!-- Showcase -->
-  <section id="showcase">
-    <div class="container text-center">
-      <div class="home-search p-5">
-        <div class="overlay p-5">
-          <h1 class="display-4 mb-4">
-            Property Searching Just Got So Easy
-          </h1>
-          <p class="lead">Search homes by city, state, bedrooms and budget, then contact the listing realtor in one click.</p>
-          <div class="search">
-            <form action="{% url 'search' %}">
-              <!-- Form Row 1 -->
-              <div class="form-row">
-                <div class="col-md-4 mb-3">
-                  <label class="sr-only">Keywords</label>
-                  <input type="text" name="keywords" class="form-control" placeholder="Keyword (Pool, Garage, etc)">
-                </div>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <span class="eyebrow text-white-50">BT Real Estate</span>
+      <h1 class="mt-2">Find a home you'll love.</h1>
+      <p class="lead mt-3">Search homes by city, bedrooms and budget, explore the neighbourhood and contact the listing realtor in one click.</p>
 
-                <div class="col-md-4 mb-3">
-                  <label class="sr-only">City</label>
-                  <input type="text" name="city" class="form-control" placeholder="City">
-                </div>
+      <form action="{% url 'search' %}" class="search-pill" role="search">
+        <div class="field">
+          <label for="h-city">Location</label>
+          <input id="h-city" type="text" name="city" placeholder="City, e.g. Miami">
+        </div>
+        <div class="field">
+          <label for="h-bed">Bedrooms</label>
+          <select id="h-bed" name="bedrooms">
+            <option value="">Any</option>
+            {% for key, value in bedroom_choices.items %}<option value="{{ key }}">Up to {{ value }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="h-price">Max price</label>
+          <select id="h-price" name="price">
+            <option value="">Any</option>
+            {% for key, value in price_choices.items %}<option value="{{ key }}">{{ value }}</option>{% endfor %}
+          </select>
+        </div>
+        <button class="btn btn-primary" type="submit"><i class="fas fa-search me-2"></i>Search</button>
+      </form>
 
-                <div class="col-md-4 mb-3">
-                  <label class="sr-only">State</label>
-                  <select name="state" class="form-control">
-                    <option selected="true" disabled="disabled">State (All)</option>
-                    {% for key,value in state_choices.items %}
-                      <option value= "{{ key }}">{{ value }}</option>
+      {% if top_cities %}
+        <div class="city-chips">
+          {% for city in top_cities %}<a href="{% url 'search' %}?city={{ city|urlencode }}">{{ city }}</a>{% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </section>
 
-                    {% endfor %}
-                    
-                  </select>
-                </div>
-              </div>
-              <!-- Form Row 2 -->
-              <div class="form-row">
-                <div class="col-md-6 mb-3">
-                  <label class="sr-only">Bedrooms</label>
-                  <select name="bedrooms" class="form-control">
-                    <option selected="true" disabled="disabled">Bedrooms (All)</option>
-                    {% for key,value in bedroom_choices.items %}
-                      <option value= "{{ key }}">{{ value }}</option>
+  <!-- Stats -->
+  <div class="container stats-strip">
+    <div class="stats-card">
+      <div><div class="stat-value">{{ listing_count }}</div><div class="stat-label">Homes for sale</div></div>
+      <div><div class="stat-value">{{ city_count }}</div><div class="stat-label">Cities</div></div>
+      <div><div class="stat-value">{{ realtor_count }}</div><div class="stat-label">Expert realtors</div></div>
+    </div>
+  </div>
 
-                    {% endfor %}
-                  </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <select name="price" class="form-control" id="type">
-                    <option selected="true" disabled="disabled">Max Price (Any)</option>
-                    {% for key,value in price_choices.items %}
-                      <option value= "{{ key }}">{{ value }}</option>
-                    {% endfor %}
-                  </select>
-                </div>
-              </div>
-              <button class="btn btn-secondary btn-block mt-4" type="submit">Submit form</button>
-            </form>
+  <!-- Latest listings -->
+  <section class="section">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-2">
+        <div>
+          <h2 class="section-title">Latest listings</h2>
+          <p class="section-sub mb-4">Fresh on the market this week</p>
+        </div>
+        <a href="{% url 'listings' %}" class="btn btn-light mb-4">View all <i class="fas fa-arrow-right ms-1"></i></a>
+      </div>
+      <div class="row g-4">
+        {% for listing in listings %}
+          <div class="col-md-6 col-lg-4">{% include 'partials/_listing_card.html' %}</div>
+        {% empty %}
+          <div class="col-12"><div class="empty-state"><div class="icon"><i class="fas fa-home"></i></div><h3 class="h5">No listings yet</h3><p class="text-muted mb-0">Check back soon.</p></div></div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section bg-canvas">
+    <div class="container">
+      <div class="text-center">
+        <span class="eyebrow">Why BT Real Estate</span>
+        <h2 class="section-title mt-2">Everything you need to decide with confidence</h2>
+        <p class="section-sub">From the first search to the keys in your hand</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="feature">
+            <div class="icon"><i class="fas fa-map-marked-alt"></i></div>
+            <h3>See the neighbourhood</h3>
+            <p>Every listing comes with a full photo gallery and an interactive map of its location.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="feature">
+            <div class="icon"><i class="fas fa-calculator"></i></div>
+            <h3>Know your budget</h3>
+            <p>Estimate your monthly mortgage payment right on the listing page with our calculator.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="feature">
+            <div class="icon"><i class="fas fa-comments"></i></div>
+            <h3>Talk to a realtor</h3>
+            <p>Send an inquiry in one click and keep track of every home you've asked about in your dashboard.</p>
           </div>
         </div>
       </div>
     </div>
   </section>
-<br> 
 
-  <!-- Alerts -->
-  {% include 'partials/_alerts.html' %}
-
-  <!-- Listings -->
-  <section id="listings" class="py-5">
+  <!-- CTA -->
+  <section class="section pb-0">
     <div class="container">
-      <h3 class="text-center mb-3">Latest Listings</h3>
-      <div class="row">    
-        {% if listings %}
-          {% for listing in listings %}
-              <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card listing-preview">
-                  <img class="card-img-top" src="{{ listing.photo_main.url }}" alt="">
-                  <div class="card-img-overlay">
-                    <h2>
-                      <span class="badge badge-secondary text-white">${{ listing.price | intcomma }}</span>
-                    </h2>
-                  </div>
-                  <div class="card-body">
-                    <div class="listing-heading text-center">
-                      <h4 class="text-primary">{{ listing.title }}</h4>
-                      <p>
-                        <i class="fas fa-map-marker text-secondary"></i> {{ listing.city }} {{ listing.state }}, {{ listing.zipcode }}</p>
-                    </div>
-                    <hr>
-                    <div class="row py-2 text-secondary">
-                      <div class="col-6">
-                        <i class="fas fa-th-large"></i> Sqft: {{ listing.sqft }}</div>
-                      <div class="col-6">
-                        <i class="fas fa-car"></i> Garage: {{ listing.garage }}</div>
-                    </div>
-                    <div class="row py-2 text-secondary">
-                      <div class="col-6">
-                        <i class="fas fa-bed"></i> Bedrooms: {{ listing.bedrooms }}</div>
-                      <div class="col-6">
-                        <i class="fas fa-bath"></i> Bathrooms: {{ listing.bathrooms }}</div>
-                    </div>
-                    <hr>
-                    <div class="row py-2 text-secondary">
-                      <div class="col-6">
-                        <i class="fas fa-user"></i> {{ listing.realtor }}</div>
-                    </div>
-                    <div class="row text-secondary pb-2">
-                      <div class="col-6">
-                        <i class="fas fa-clock"></i> {{ listing.list_date | timesince }}</div>
-                    </div>
-                    <hr>
-                    <a href="{% url 'listing' listing.id %}" class="btn btn-primary btn-block">More Info</a>
-                  </div>
-                </div>
-              </div>
-
-
-          {% endfor %}
+      <div class="cta-band">
+        <div>
+          <h2>Ready to find your next home?</h2>
+          <p>Create a free account to track your inquiries in one place.</p>
+        </div>
+        {% if user.is_authenticated %}
+          <a href="{% url 'listings' %}" class="btn btn-primary btn-lg">Browse listings</a>
         {% else %}
-          <div class= "col-md-12">
-            <p>No Listings Available</p>
-          </div>
-        {% endif %}     
+          <a href="{% url 'register' %}" class="btn btn-primary btn-lg">Create free account</a>
+        {% endif %}
       </div>
     </div>
   </section>
-
-  <section id="services" class="py-5 bg-secondary text-white">
-    <div class="container">
-      <div class="row text-center">
-        <div class="col-md-4">
-          <i class="fas fa-comment fa-4x mr-4"></i>
-          <hr>
-          <h3>Consulting Services</h3>
-          <p>Expert advice on pricing, market trends and investment potential, so every decision you make is an informed one.</p>
-        </div>
-        <div class="col-md-4">
-          <i class="fas fa-home fa-4x mr-4"></i>
-          <hr>
-          <h3>Property Management</h3>
-          <p>Hands-off ownership: we handle tenants, maintenance and rent collection while your property keeps earning.</p>
-        </div>
-        <div class="col-md-4">
-          <i class="fas fa-suitcase fa-4x mr-4"></i>
-          <hr>
-          <h3>Renting & Selling</h3>
-          <p>Whether you are renting your first apartment or selling a family home, our realtors guide you from listing to keys.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
 {% endblock %}

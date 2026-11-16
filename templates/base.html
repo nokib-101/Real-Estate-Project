@@ -2,37 +2,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="{% static 'css/all.css' %}">
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
-    <!-- Custom -->
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <!-- Lightbox -->
-    <link rel="stylesheet" href="{% static 'css/lightbox.min.css' %}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="BT Real Estate: browse homes for sale, view photos and maps, estimate mortgage payments and contact a realtor.">
+  <meta name="theme-color" content="#2563eb">
+  <link rel="preload" href="{% static 'vendor/inter/inter-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{% static 'css/all.css' %}">
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
+  {% block extra_head %}{% endblock %}
+  <!-- Custom -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
-    <title> BT Real Estate {% block title %} {% endblock %} </title>
+  <title>{% block title %}BT Real Estate{% endblock %} · BT Real Estate</title>
 </head>
-<body>
-  <!-- Top Bar -->
-    {% include 'partials/_topbar.html'%}
-  <!--Nav Bar -->
-    {% include 'partials/_navbar.html' %}
-  
-    {% block content %}
+<body class="{% block body_class %}{% endblock %}">
+  {% include 'partials/_navbar.html' %}
+  {% include 'partials/_alerts.html' %}
 
-    {% endblock %}
+  <main>
+    {% block content %}{% endblock %}
+  </main>
 
-  <!--Footer-->
-    {% include 'partials/_footer.html' %}
+  {% include 'partials/_footer.html' %}
 
-
-    <script src="{% static 'js/jquery-3.3.1.min.js' %} "></script>
-    <script src="{% static 'js/bootstrap.bundle.min.js' %} "></script>
-    <script src="{% static 'js/main.js' %}"></script>
-    <script src="{% static 'js/lightbox.min.js' %}"></script>
+  <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+  <script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>
-

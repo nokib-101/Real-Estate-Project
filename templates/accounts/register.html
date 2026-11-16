@@ -1,55 +1,51 @@
 {% extends 'base.html' %}
 
-{% block title %} | Register Account {% endblock %}
+{% block title %}Sign up{% endblock %}
 
 {% block content %}
-
-<section id="register" class="bg-light py-5">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-6 mx-auto">
-          <div class="card">
-            <div class="card-header bg-primary text-white">
-              <h4>
-                <i class="fas fa-user-plus"></i> Register</h4>
+  <div class="auth-wrap">
+    <div class="auth-form">
+      <div class="inner">
+        <h1 class="h2 mb-1">Create your account</h1>
+        <p class="text-muted mb-4">Track your inquiries and hear back from realtors faster.</p>
+        <form action="{% url 'register' %}" method="POST">
+          {% csrf_token %}
+          <div class="row g-3 mb-3">
+            <div class="col-sm-6">
+              <label class="form-label" for="first_name">First name</label>
+              <input id="first_name" type="text" name="first_name" class="form-control" autocomplete="given-name" required>
             </div>
-            <div class="card-body">
-                <!-- Alerts -->
-                {% include 'partials/_alerts.html' %}
-                <form action="{% url 'register' %}" method="POST">
-                    {% csrf_token %}
-                  <div class="form-group">
-                  <label for="first_name">First Name</label>
-                  <input type="text" name="first_name" class="form-control" required>
-                </div>
-                <div class="form-group">
-                  <label for="last_name">Last Name</label>
-                  <input type="text" name="last_name" class="form-control" required>
-                </div>
-                <div class="form-group">
-                  <label for="username">Username</label>
-                  <input type="text" name="username" class="form-control" required>
-                </div>
-                <div class="form-group">
-                  <label for="email">Email</label>
-                  <input type="email" name="email" class="form-control" required>
-                </div>
-                <div class="form-group">
-                  <label for="password2">Password</label>
-                  <input type="password" name="password" class="form-control" required>
-                </div>
-                <div class="form-group">
-                  <label for="password">Confirm Password</label>
-                  <input type="password" name="password2" class="form-control" required>
-                </div>
-                <input type="submit" value="Register" class="btn btn-secondary btn-block">
-              </form>
+            <div class="col-sm-6">
+              <label class="form-label" for="last_name">Last name</label>
+              <input id="last_name" type="text" name="last_name" class="form-control" autocomplete="family-name" required>
             </div>
           </div>
-        </div>
+          <div class="mb-3">
+            <label class="form-label" for="username">Username</label>
+            <input id="username" type="text" name="username" class="form-control" autocomplete="username" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="email">Email</label>
+            <input id="email" type="email" name="email" class="form-control" autocomplete="email" required>
+          </div>
+          <div class="row g-3 mb-2">
+            <div class="col-sm-6">
+              <label class="form-label" for="password">Password</label>
+              <input id="password" type="password" name="password" class="form-control" autocomplete="new-password" required>
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label" for="password2">Confirm password</label>
+              <input id="password2" type="password" name="password2" class="form-control" autocomplete="new-password" required>
+            </div>
+          </div>
+          <p class="small text-muted mb-4">At least 8 characters, not too common and not all numbers.</p>
+          <button type="submit" class="btn btn-primary w-100">Create account</button>
+        </form>
+        <p class="text-muted mt-4 mb-0 text-center">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
       </div>
     </div>
-</section>
-
+    <div class="auth-art" aria-hidden="true">
+      <blockquote>Join to keep every home you love in one place.</blockquote>
+    </div>
+  </div>
 {% endblock %}
-

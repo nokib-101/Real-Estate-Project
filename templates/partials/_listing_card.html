@@ -1,0 +1,30 @@
+{% load humanize %}
+{# A listing card with a swipeable photo strip. Expects `listing`. #}
+<article class="listing-card">
+  <div class="media" data-media>
+    <span class="price-tag">${{ listing.price|intcomma }}</span>
+    <div class="media-track">
+      {% for photo in listing.photos %}
+        <a href="{% url 'listing' listing.id %}" tabindex="-1"><img src="{{ photo.url }}" alt="{{ listing.title }}, photo {{ forloop.counter }}" loading="lazy"></a>
+      {% endfor %}
+    </div>
+    {% if listing.photos|length > 1 %}
+      <button class="media-nav prev" type="button" aria-label="Previous photo"><i class="fas fa-chevron-left"></i></button>
+      <button class="media-nav next" type="button" aria-label="Next photo"><i class="fas fa-chevron-right"></i></button>
+      <div class="media-dots">{% for photo in listing.photos %}<span{% if forloop.first %} class="on"{% endif %}></span>{% endfor %}</div>
+    {% endif %}
+  </div>
+  <div class="listing-body">
+    <h3 class="listing-title"><a class="card-link text-ink" href="{% url 'listing' listing.id %}">{{ listing.title }}</a></h3>
+    <div class="listing-loc"><i class="fas fa-map-marker-alt me-1"></i>{{ listing.city }}, {{ listing.state }} {{ listing.zipcode }}</div>
+    <div class="facts">
+      <span><i class="fas fa-bed"></i>{{ listing.bedrooms }} bd</span>
+      <span><i class="fas fa-bath"></i>{{ listing.bathrooms|floatformat:"-1" }} ba</span>
+      <span><i class="fas fa-ruler-combined"></i>{{ listing.sqft|intcomma }} sqft</span>
+      {% if listing.garage %}<span><i class="fas fa-car"></i>{{ listing.garage }} garage</span>{% endif %}
+    </div>
+    <div class="listing-meta">
+      <i class="fas fa-user-tie"></i> {{ listing.realtor.name }} · Listed {{ listing.list_date|timesince }} ago
+    </div>
+  </div>
+</article>

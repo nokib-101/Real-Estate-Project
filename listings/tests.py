@@ -59,3 +59,42 @@ class RealtorDeletionTests(TestCase):
         make_listing(realtor)
         with self.assertRaises(ProtectedError):
             realtor.delete()
+
+
+class ListingPageFeatureTests(TestCase):
+    def setUp(self):
+        self.listing = make_listing(make_realtor(), photo_1='inside.jpg', photo_3='garden.jpg')
+
+    def test_photos_lists_uploaded_photos_main_first(self):
+        self.assertEqual([p.name for p in self.listing.photos], ['home.jpg', 'inside.jpg', 'garden.jpg'])
+
+    def test_map_shown_only_with_coordinates(self):
+        response = self.client.get(reverse('listing', args=[self.listing.id]))
+        self.assertNotContains(response, 'id="map"')
+        self.assertContains(response, 'View address on OpenStreetMap')
+        self.listing.latitude, self.listing.longitude = 42.3601, -71.0589
+        self.listing.save()
+        response = self.client.get(reverse('listing', args=[self.listing.id]))
+        self.assertContains(response, 'data-lat="42.360100" data-lng="-71.058900"')
+
+    def test_mortgage_calculator_prefilled_with_price(self):
+        response = self.client.get(reverse('listing', args=[self.listing.id]))
+        self.assertContains(response, 'id="calc-price" type="number" class="form-control" min="0" step="1000" value="500000"')
+
+
+class SeedDemoTests(TestCase):
+    def test_seed_loads_once_and_fills_coordinates(self):
+        from django.core.management import call_command
+        from io import StringIO
+        call_command('seed_demo', stdout=StringIO())
+        call_command('seed_demo', stdout=StringIO())
+        self.assertEqual(Listing.objects.count(), 9)
+        self.assertFalse(Listing.objects.filter(latitude__isnull=True).exists())
+
+    def test_seed_backfills_coordinates_on_existing_demo_listing(self):
+        from django.core.management import call_command
+        from io import StringIO
+        make_listing(make_realtor(), title='Urban Modern Townhouse')
+        call_command('seed_demo', stdout=StringIO())
+        self.assertEqual(Listing.objects.count(), 1)  # existing data: nothing new loaded
+        self.assertIsNotNone(Listing.objects.get().latitude)
