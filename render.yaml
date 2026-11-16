@@ -1,0 +1,34 @@
+# Render Blueprint: a free Django web service and the free Postgres database
+# it connects to. In Render: New > Blueprint > pick this repository.
+databases:
+  - name: btre-db
+    plan: free
+    databaseName: btredb
+    user: btre
+
+services:
+  - type: web
+    name: btre-real-estate
+    runtime: python
+    plan: free
+    buildCommand: ./build.sh
+    # Migrations and demo data run at start (they need the database, and the
+    # free plan wipes files written at runtime, so demo photos are re-copied)
+    startCommand: python manage.py migrate --no-input && python manage.py seed_demo && gunicorn btre.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: DATABASE_URL
+        fromDatabase:
+          name: btre-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: WEB_CONCURRENCY
+        value: 2
+      - key: DJANGO_SUPERUSER_USERNAME
+        value: admin
+      - key: DJANGO_SUPERUSER_PASSWORD
+        generateValue: true

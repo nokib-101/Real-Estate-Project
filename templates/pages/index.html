@@ -12,8 +12,7 @@
           <h1 class="display-4 mb-4">
             Property Searching Just Got So Easy
           </h1>
-          <p class="lead">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Recusandae quas, asperiores eveniet vel nostrum magnam
-            voluptatum tempore! Consectetur, id commodi!</p>
+          <p class="lead">Search homes by city, state, bedrooms and budget, then contact the listing realtor in one click.</p>
           <div class="search">
             <form action="{% url 'search' %}">
               <!-- Form Row 1 -->
@@ -92,7 +91,7 @@
                     <div class="listing-heading text-center">
                       <h4 class="text-primary">{{ listing.title }}</h4>
                       <p>
-                        <i class="fas fa-map-marker text-secondary"></i> {{ listing.city }}{{ listing.state }}, {{ listing.zipcode }}</p>
+                        <i class="fas fa-map-marker text-secondary"></i> {{ listing.city }} {{ listing.state }}, {{ listing.zipcode }}</p>
                     </div>
                     <hr>
                     <div class="row py-2 text-secondary">
@@ -140,22 +139,19 @@
           <i class="fas fa-comment fa-4x mr-4"></i>
           <hr>
           <h3>Consulting Services</h3>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Incidunt, debitis nam! Repudiandae, provident iste consequatur
-            hic dignissimos ratione ea quae.</p>
+          <p>Expert advice on pricing, market trends and investment potential, so every decision you make is an informed one.</p>
         </div>
         <div class="col-md-4">
           <i class="fas fa-home fa-4x mr-4"></i>
           <hr>
-          <h3>Propery Management</h3>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Incidunt, debitis nam! Repudiandae, provident iste consequatur
-            hic dignissimos ratione ea quae.</p>
+          <h3>Property Management</h3>
+          <p>Hands-off ownership: we handle tenants, maintenance and rent collection while your property keeps earning.</p>
         </div>
         <div class="col-md-4">
           <i class="fas fa-suitcase fa-4x mr-4"></i>
           <hr>
           <h3>Renting & Selling</h3>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Incidunt, debitis nam! Repudiandae, provident iste consequatur
-            hic dignissimos ratione ea quae.</p>
+          <p>Whether you are renting your first apartment or selling a family home, our realtors guide you from listing to keys.</p>
         </div>
       </div>
     </div>

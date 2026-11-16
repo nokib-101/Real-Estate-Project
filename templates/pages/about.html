@@ -25,11 +25,11 @@
       <div class="row">
         <div class="col-md-8">
           <h2>We Search For The Perfect Home</h2>
-          <p class="lead">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sunt, pariatur!</p>
+          <p class="lead">Find out who we are and how we help buyers and sellers</p>
           <img src="{% static 'img/about.jpg' %}" alt="">
-          <p class="mt-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis esse officia repudiandae ad saepe ex, amet
-            neque quod accusamus rem quia magnam magni dolorum facilis ullam minima perferendis? Exercitationem at quaerat
-            commodi id libero eveniet harum perferendis laborum molestias quia.</p>
+          <p class="mt-4">BT Real Estate connects buyers with homes that fit the way they live. Our realtors know their
+            neighbourhoods inside out, and every listing is presented with clear details, honest pricing and plenty of
+            photos, so you can shortlist with confidence before you ever book a viewing.</p>
         </div>
         <div class="col-md-4">
           {% if mvp_realtors %}
@@ -55,9 +55,9 @@
   <!-- Work -->
   <section id="work" class="bg-dark text-white text-center">
     <h2 class="display-4">We Work For You</h2>
-    <h4>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem velit aperiam, unde aliquid at similique!</h4>
+    <h4>Local expertise, transparent pricing and a realtor who answers your questions</h4>
     <hr>
-    <a href="listings.html" class="btn btn-secondary text-white btn-lg">View Our Featured Listings</a>
+    <a href="{% url 'listings' %}" class="btn btn-secondary text-white btn-lg">View Our Featured Listings</a>
   </section>
 
   <!-- Team -->
