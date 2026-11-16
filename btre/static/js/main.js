@@ -85,6 +85,10 @@ if (mapEl && window.L) {
   const map = L.map(mapEl, { scrollWheelZoom: false }).setView(pos, 14);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
+    // OpenStreetMap's tile policy blocks requests without a Referer, and
+    // Django's default Referrer-Policy (same-origin) strips it. Send just
+    // the site's origin with tile requests.
+    referrerPolicy: 'strict-origin-when-cross-origin',
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(map);
   L.marker(pos).addTo(map).bindPopup(mapEl.dataset.label);
