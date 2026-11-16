@@ -161,11 +161,36 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS =[
     os.path.join(BASE_DIR,'btre/static')
 ]
+
+def _clean_cloudinary_url(raw):
+    """Accept common copy-paste variants of CLOUDINARY_URL; return '' if unusable.
+
+    The Cloudinary dashboard shows 'CLOUDINARY_URL=cloudinary://...', so the
+    variable name or quotes easily end up in the value. The Cloudinary SDK
+    reads os.environ when imported and raises on a bad value, which would
+    break every page that shows a photo.
+    """
+    value = (raw or '').strip().strip('\'"').strip()
+    if value.upper().startswith('CLOUDINARY_URL='):
+        value = value.split('=', 1)[1].strip().strip('\'"').strip()
+    return value if value.startswith('cloudinary://') and '@' in value else ''
+
+
+_raw_cloudinary_url = os.getenv('CLOUDINARY_URL', '')
+CLOUDINARY_URL = _clean_cloudinary_url(_raw_cloudinary_url)
+if CLOUDINARY_URL:
+    os.environ['CLOUDINARY_URL'] = CLOUDINARY_URL  # the SDK reads it from here
+elif _raw_cloudinary_url.strip():
+    os.environ.pop('CLOUDINARY_URL', None)
+    import sys
+    sys.stderr.write('WARNING: CLOUDINARY_URL is set but not valid (it must look like '
+                     'cloudinary://<api_key>:<api_secret>@<cloud_name>). Uploads are stored locally.\n')
+
 # WhiteNoise serves static files in production; compressed + cache-busted.
 # With CLOUDINARY_URL set (cloudinary://key:secret@cloud-name), uploaded
 # photos are stored on Cloudinary so they survive restarts (btre/storage.py).
 STORAGES = {
-    'default': {'BACKEND': 'btre.storage.MediaStorage' if os.getenv('CLOUDINARY_URL')
+    'default': {'BACKEND': 'btre.storage.MediaStorage' if CLOUDINARY_URL
                 else 'django.core.files.storage.FileSystemStorage'},
     'staticfiles': {
         'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'
