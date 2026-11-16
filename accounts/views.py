@@ -1,7 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages, auth
 from django.contrib.auth import get_user_model
-from contacts.models import Contact 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.utils.http import url_has_allowed_host_and_scheme
+from contacts.models import Contact
 
 
 User = get_user_model()
@@ -9,53 +13,64 @@ User = get_user_model()
 
 def register(request):
     if request.method == "POST":
-        # Get form values 
-        first_name = request.POST['first_name']  
-        last_name = request.POST['last_name'] 
-        username = request.POST['username'] 
-        email = request.POST['email'] 
-        password = request.POST['password']  
-        password2 = request.POST['password2'] 
-        # check password match 
-        if password == password2:
-            #check username 
-            if User.objects.filter(username=username).exists():
-                messages.error(request, 'That username is taken ')
-                return redirect('register')
-            else:
-                if User.objects.filter(email=email).exists():
-                    messages.error(request, 'That email is being used ')
-                    return redirect('register')
-                else:
-                    user = User.objects.create_user(username=username, password=password, email=email, first_name = first_name, last_name = last_name)        
-                    # login after registration 
-                    user.save()
-                    messages.success(request, 'You are now register and can log in')
-                    return redirect('login')                
-        else:
+        # Get form values
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '')
+        password2 = request.POST.get('password2', '')
+
+        if not username or not email or not password:
+            messages.error(request, 'Please fill in all required fields')
+            return redirect('register')
+        # check password match
+        if password != password2:
             messages.error(request, 'Passwords do not match')
             return redirect('register')
+        # check username
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'That username is taken')
+            return redirect('register')
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'That email is being used')
+            return redirect('register')
+        # apply the password rules from AUTH_PASSWORD_VALIDATORS
+        candidate = User(username=username, email=email, first_name=first_name, last_name=last_name)
+        try:
+            validate_password(password, user=candidate)
+        except ValidationError as e:
+            for error in e.messages:
+                messages.error(request, error)
+            return redirect('register')
+
+        User.objects.create_user(username=username, password=password, email=email,
+                                 first_name=first_name, last_name=last_name)
+        messages.success(request, 'You are now registered and can log in')
+        return redirect('login')
     else:
         return render(request, 'accounts/register.html')
 
 def login(request):
     if request.method == "POST":
-        # Login User 
-        username = request.POST['username']
-        password = request.POST['password'] 
+        # Login User
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
 
-        user = auth.authenticate(username=username, password=password)
+        user = auth.authenticate(request, username=username, password=password)
 
         if user is not None:
             auth.login(request, user)
             messages.success(request, 'You are now logged in')
+            # go back to the page that asked for login, if it's on this site
+            next_url = request.POST.get('next') or request.GET.get('next')
+            if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()},
+                                                            require_https=request.is_secure()):
+                return redirect(next_url)
             return redirect('dashboard')
         else:
             messages.error(request, 'Invalid credentials')
             return redirect('login')
-        
-
-        
     else:
         return render(request, 'accounts/login.html')
 
@@ -63,15 +78,13 @@ def login(request):
 def logout(request):
     if request.method == "POST":
         auth.logout(request)
-        messages.success(request, 'Logout successful ')    
-        return redirect('index')
+        messages.success(request, 'Logout successful')
+    return redirect('index')
 
+@login_required
 def dashboard(request):
     user_contacts = Contact.objects.order_by('-contact_date').filter(user_id=request.user.id)
     context = {
         'contacts': user_contacts
     }
-    return render(request, 'accounts/dashboard.html',context)
-
-
-
+    return render(request, 'accounts/dashboard.html', context)

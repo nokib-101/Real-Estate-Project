@@ -1,46 +1,63 @@
-from django.shortcuts import render, redirect
+import logging
+
+from django.conf import settings
 from django.contrib import messages
-from django.core.mail import send_mail
+from django.core.exceptions import ValidationError
+from django.core.mail import EmailMessage
+from django.core.validators import validate_email
+from django.shortcuts import get_object_or_404, redirect
+
+from listings.models import Listing
 from .models import Contact
+
+logger = logging.getLogger(__name__)
 
 
 def contact(request):
-    if request.method == 'POST':
-        listing_id = request.POST['listing_id']
-        listing = request.POST['listing']
-        name = request.POST['name']
-        email = request.POST['email']
-        phone = request.POST['phone']
-        inq_message = request.POST['message']
-        user_id = request.POST['user_id']
-        realtor_email = request.POST['realtor_email']
+    if request.method != 'POST':
+        return redirect('listings')
 
-        # check already made iquiry 
+    # The listing and its realtor come from the database, never from the form,
+    # so the email recipient and property title can't be forged.
+    listing = get_object_or_404(Listing, pk=request.POST.get('listing_id', ''), is_published=True)
+    name = request.POST.get('name', '').strip()
+    email = request.POST.get('email', '').strip()
+    phone = request.POST.get('phone', '').strip()
+    inq_message = request.POST.get('message', '').strip()
 
-        if request.user.is_authenticated:
-            user_id = request.user.id 
-            has_contacted = Contact.objects.all().filter(listing_id=listing_id, user_id=user_id)
-            if has_contacted:
-                messages.error(request, 'You have already made a inquiry for this listing')
-                return redirect('/listings/'+listing_id)
+    if not name or not email:
+        messages.error(request, 'Please enter your name and email')
+        return redirect('listing', listing_id=listing.id)
+    try:
+        validate_email(email)
+    except ValidationError:
+        messages.error(request, 'Please enter a valid email address')
+        return redirect('listing', listing_id=listing.id)
 
-        contact = Contact(listing= listing,listing_id =listing_id,name=name, email=email,phone=phone,message=inq_message, user_id=user_id)
+    # Only a logged-in user's own id is recorded; anonymous inquiries use 0
+    user_id = request.user.id if request.user.is_authenticated else 0
 
-        contact.save()
-        #send email
-        '''send_mail(
-            'Property Listing Inquiry',
-            'There has been an inquiry for ' + listing + '. Sign into the admin panel for more info',
-            'dummy101@gmail.com', [realtor_email,],
-            fail_silently=False
-        )'''
+    # check already made inquiry
+    if request.user.is_authenticated and Contact.objects.filter(listing_id=listing.id, user_id=user_id).exists():
+        messages.error(request, 'You have already made an inquiry for this listing')
+        return redirect('listing', listing_id=listing.id)
 
+    Contact.objects.create(listing=listing.title, listing_id=listing.id, name=name, email=email,
+                           phone=phone, message=inq_message, user_id=user_id)
 
+    # send email; the inquiry is already saved, so a mail failure must not break the page
+    try:
+        EmailMessage(
+            subject=f'Property Listing Inquiry: {listing.title}',
+            body=(f'There has been an inquiry for {listing.title}.\n\n'
+                  f'Name: {name}\nEmail: {email}\nPhone: {phone or "-"}\n\n'
+                  f'Message:\n{inq_message or "-"}\n'),
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[listing.realtor.email],
+            reply_to=[email],
+        ).send()
+    except Exception:
+        logger.exception('Failed to send inquiry email for listing %s', listing.id)
 
-        messages.success(request, 'Your request has been submitted, a realtor will get back to you soon')
-
-        return redirect('/listings/'+listing_id)
-    
-    
-    
-
+    messages.success(request, 'Your request has been submitted, a realtor will get back to you soon')
+    return redirect('listing', listing_id=listing.id)
