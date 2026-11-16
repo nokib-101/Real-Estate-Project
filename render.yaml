@@ -28,3 +28,7 @@ services:
         value: admin
       - key: DJANGO_SUPERUSER_PASSWORD
         generateValue: true
+      # From the Cloudinary dashboard: cloudinary://<api_key>:<api_secret>@<cloud_name>
+      # Stores uploaded photos so they survive restarts on the free plan.
+      - key: CLOUDINARY_URL
+        sync: false

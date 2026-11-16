@@ -1,4 +1,5 @@
 
+from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from .choices import price_choices, bedroom_choices, state_choices
@@ -19,10 +20,15 @@ def index(request):
 
 
 def listing(request, listing_id):
-    listing = get_object_or_404(Listing, pk=listing_id, is_published=True)
+    listing = get_object_or_404(Listing.objects.select_related('realtor'), pk=listing_id)
+    # Hidden listings are visible only to the realtor who owns them (as a preview)
+    is_owner = request.user.is_authenticated and listing.realtor.user_id == request.user.id
+    if not listing.is_published and not is_owner:
+        raise Http404('No Listing matches the given query.')
 
     context = {
-        'listing':listing
+        'listing': listing,
+        'is_owner': is_owner,
     }
 
     return render(request,'listings/listing.html',context)

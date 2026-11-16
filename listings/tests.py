@@ -6,7 +6,9 @@ from .models import Listing
 
 
 def make_realtor(**kwargs):
-    return Realtor.objects.create(name='Jane Agent', photo='realtor.jpg', phone='555', email='jane@realty.test', **kwargs)
+    fields = dict(name='Jane Agent', photo='realtor.jpg', phone='555', email='jane@realty.test')
+    fields.update(kwargs)
+    return Realtor.objects.create(**fields)
 
 
 def make_listing(realtor, **kwargs):

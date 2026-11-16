@@ -1,0 +1,20 @@
+{# Portal header with tabs. Expects `realtor` and `tab`. #}
+<section class="dash-head pb-0">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+      <div class="d-flex align-items-center gap-3">
+        <img src="{{ realtor.photo.url }}" alt="{{ realtor.name }}" class="avatar" style="width: 56px; height: 56px;">
+        <div>
+          <span class="eyebrow">Realtor portal</span>
+          <h1 class="h3 mb-0">{{ realtor.name }}</h1>
+        </div>
+      </div>
+      <a href="{% url 'realtor_listing_create' %}" class="btn btn-primary"><i class="fas fa-plus me-2"></i>New listing</a>
+    </div>
+    <nav class="portal-tabs" aria-label="Realtor portal">
+      <a href="{% url 'realtor_portal' %}" class="{% if tab == 'overview' %}active{% endif %}">Overview</a>
+      <a href="{% url 'realtor_inquiries' %}" class="{% if tab == 'inquiries' %}active{% endif %}">Inquiries</a>
+      <a href="{% url 'realtor_profile' %}" class="{% if tab == 'profile' %}active{% endif %}">Profile</a>
+    </nav>
+  </div>
+</section>

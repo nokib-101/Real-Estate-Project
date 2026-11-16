@@ -93,3 +93,56 @@ if (mapEl && window.L) {
   }).addTo(map);
   L.marker(pos).addTo(map).bindPopup(mapEl.dataset.label);
 }
+
+// Ask before destructive actions (e.g. deleting a listing)
+document.querySelectorAll('form[data-confirm]').forEach(form => {
+  form.addEventListener('submit', e => { if (!confirm(form.dataset.confirm)) e.preventDefault(); });
+});
+
+// Listing form: click the map to set latitude/longitude
+const picker = document.querySelector('[data-map-picker]');
+if (picker && window.L) {
+  L.Icon.Default.imagePath = '';
+  L.Icon.Default.mergeOptions({
+    iconUrl: picker.dataset.icon, iconRetinaUrl: picker.dataset.icon2x, shadowUrl: picker.dataset.shadow,
+  });
+  const latInput = document.getElementById('id_latitude');
+  const lngInput = document.getElementById('id_longitude');
+  const start = latInput.value && lngInput.value ? [+latInput.value, +lngInput.value] : null;
+  const map = L.map(picker).setView(start || [39.5, -98.35], start ? 15 : 4);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    referrerPolicy: 'strict-origin-when-cross-origin',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
+  let marker = start ? L.marker(start).addTo(map) : null;
+  const place = latlng => {
+    marker = marker ? marker.setLatLng(latlng) : L.marker(latlng).addTo(map);
+    latInput.value = latlng.lat.toFixed(6);
+    lngInput.value = latlng.lng.toFixed(6);
+  };
+  map.on('click', e => place(e.latlng));
+  [latInput, lngInput].forEach(input => input.addEventListener('change', () => {
+    if (latInput.value && lngInput.value) {
+      const ll = L.latLng(+latInput.value, +lngInput.value);
+      place(ll);
+      map.setView(ll, Math.max(map.getZoom(), 13));
+    }
+  }));
+}
+
+// Listing form: preview a photo as soon as it's chosen
+document.querySelectorAll('.photo-slot input[type=file]').forEach(input => {
+  input.addEventListener('change', () => {
+    const file = input.files[0];
+    if (!file || !file.type.startsWith('image/')) return;
+    const slot = input.closest('.photo-slot');
+    let img = slot.querySelector('img');
+    if (!img) {
+      img = document.createElement('img');
+      img.alt = 'Selected photo';
+      slot.querySelector('.placeholder-img').replaceWith(img);
+    }
+    img.src = URL.createObjectURL(file);
+  });
+});

@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.utils.http import url_has_allowed_host_and_scheme
 from contacts.models import Contact
 from listings.models import Listing
+from realtors.models import Realtor
 
 
 User = get_user_model()
@@ -68,6 +69,8 @@ def login(request):
             if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()},
                                                             require_https=request.is_secure()):
                 return redirect(next_url)
+            if Realtor.objects.filter(user=user).exists():
+                return redirect('realtor_portal')
             return redirect('dashboard')
         else:
             messages.error(request, 'Invalid credentials')

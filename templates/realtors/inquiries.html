@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Inquiries{% endblock %}
+
+{% block content %}
+  {% include 'realtors/_portal_head.html' with tab='inquiries' %}
+
+  <section class="section-sm">
+    <div class="container" style="max-width: 900px;">
+      <h2 class="h4 mb-3">Inquiries about your listings <span class="text-muted fw-normal">({{ contacts|length }})</span></h2>
+      {% for contact in contacts %}
+        <div class="inquiry-row mb-3">
+          <div class="d-flex justify-content-between flex-wrap gap-2">
+            <div>
+              <span class="who">{{ contact.name }}</span>
+              <span class="text-muted small ms-1">about <a href="{% url 'listing' contact.listing_id %}">{{ contact.current_title }}</a></span>
+            </div>
+            <span class="text-muted small" title="{{ contact.contact_date }}">{{ contact.contact_date|date:"M j, Y" }} · {{ contact.contact_date|naturaltime }}</span>
+          </div>
+          {% if contact.message %}<p class="mt-2 mb-2">{{ contact.message|linebreaksbr }}</p>{% endif %}
+          <div class="contact-links">
+            <a href="mailto:{{ contact.email }}?subject={{ 'Re: '|add:contact.current_title|urlencode }}"><i class="fas fa-reply me-1"></i>{{ contact.email }}</a>
+            {% if contact.phone %}<a href="tel:{{ contact.phone }}"><i class="fas fa-phone me-1"></i>{{ contact.phone }}</a>{% endif %}
+          </div>
+        </div>
+      {% empty %}
+        <div class="empty-state">
+          <div class="icon"><i class="fas fa-inbox"></i></div>
+          <h3 class="h5">No inquiries yet</h3>
+          <p class="text-muted mb-0">When buyers contact you about a listing, their messages show up here.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}
