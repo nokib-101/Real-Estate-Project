@@ -19,7 +19,7 @@ def index(request):
 
 
 def listing(request, listing_id):
-    listing = get_object_or_404(Listing, pk=listing_id)
+    listing = get_object_or_404(Listing, pk=listing_id, is_published=True)
 
     context = {
         'listing':listing
@@ -28,7 +28,7 @@ def listing(request, listing_id):
     return render(request,'listings/listing.html',context)
 
 def search(request):
-    queryset_list = Listing.objects.order_by('-list_date')
+    queryset_list = Listing.objects.order_by('-list_date').filter(is_published=True)
 
     # Keywords 
     if 'keywords' in request.GET:
@@ -51,13 +51,13 @@ def search(request):
     # Bedrooms
     if 'bedrooms' in request.GET:
         bedrooms = request.GET['bedrooms']
-        if bedrooms:
+        if bedrooms.isdigit():
             queryset_list = queryset_list.filter(bedrooms__lte=bedrooms)
     
     # Price
     if 'price' in request.GET:
         price = request.GET['price']
-        if price:
+        if price.isdigit():
             queryset_list = queryset_list.filter(price__lte=price)
 
 

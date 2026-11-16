@@ -19,13 +19,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
+# Secrets and deployment settings come from environment variables. The
+# defaults below are for local development only.
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(v!%^03!e39e9yaql$v0gr&^k-=+pe94)#fk8^h0j%krwgo&!a'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-local-development-only')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [h for h in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if h]
 
 
 # Application definition
@@ -78,15 +81,25 @@ WSGI_APPLICATION = 'btre.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'btredb',
-        'USER': 'postgres',
-        'PASSWORD': '5768',
-        'HOST': 'localhost'
+# Set DB_ENGINE=sqlite to run without PostgreSQL (e.g. for a quick test run)
+if os.getenv('DB_ENGINE') == 'sqlite':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'btredb'),
+            'USER': os.getenv('DB_USER', 'postgres'),
+            'PASSWORD': os.getenv('DB_PASSWORD', ''),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+        }
+    }
 
 
 # Password validation
@@ -145,11 +158,20 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger'
 }
 
-# email config 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# Email (Gmail SMTP). Use a Gmail app password, never the account password.
+# Without EMAIL_HOST_USER/EMAIL_HOST_PASSWORD, emails are printed to the
+# console instead of sent.
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'dummy101@gmail.com'
-EMAIL_HOST_PASSWORD = 'rjexzdcovwhjnkco'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
+EMAIL_TIMEOUT = 10
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER or 'webmaster@localhost'
+if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+LOGIN_URL = 'login'

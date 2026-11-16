@@ -1,13 +1,13 @@
 from django.db import models
-from datetime import datetime
+from django.utils import timezone
 from realtors.models import Realtor 
 
 
 # Create your models here.
 
 class Listing(models.Model):
-    realtor = models.ForeignKey(Realtor, on_delete=models.DO_NOTHING)
-    titel = models.CharField(max_length=200)
+    realtor = models.ForeignKey(Realtor, on_delete=models.PROTECT)
+    title = models.CharField(max_length=200)
     address = models.CharField(max_length=200)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
@@ -27,8 +27,8 @@ class Listing(models.Model):
     photo_5 = models.ImageField(upload_to='photos/%Y/%m/%d/',blank=True)
     photo_6 = models.ImageField(upload_to='photos/%Y/%m/%d/',blank=True)
     is_published = models.BooleanField(default=True)
-    list_date = models.DateTimeField(default=datetime.now,blank=True)
+    list_date = models.DateTimeField(default=timezone.now, blank=True)
 
     def __str__(self):
-        return str(self.titel)
+        return str(self.title)
     
