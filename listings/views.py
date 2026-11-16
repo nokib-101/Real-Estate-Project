@@ -6,9 +6,9 @@ from .choices import price_choices, bedroom_choices, state_choices
 from .models import Listing
 
 def index(request):
-    listings = Listing.objects.order_by('-list_date').filter(is_published=True)
+    listings = Listing.objects.order_by('-list_date').filter(is_published=True).select_related('realtor')
 
-    paginator = Paginator(listings, 3)
+    paginator = Paginator(listings, 6)
     page = request.GET.get('page')
     paged_listings = paginator.get_page(page)
 
@@ -28,7 +28,7 @@ def listing(request, listing_id):
     return render(request,'listings/listing.html',context)
 
 def search(request):
-    queryset_list = Listing.objects.order_by('-list_date').filter(is_published=True)
+    queryset_list = Listing.objects.order_by('-list_date').filter(is_published=True).select_related('realtor')
 
     # Keywords 
     if 'keywords' in request.GET:

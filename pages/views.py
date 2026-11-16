@@ -8,9 +8,14 @@ from realtors.models import Realtor
 # Create your views here.
 
 def index(request):
-    listings = Listing.objects.order_by('-list_date').filter(is_published= True)[:3]
+    published = Listing.objects.filter(is_published=True)
+    listings = published.order_by('-list_date').select_related('realtor')[:3]
     context = {
         'listings': listings,
+        'listing_count': published.count(),
+        'city_count': published.values('city').distinct().count(),
+        'realtor_count': Realtor.objects.count(),
+        'top_cities': published.values_list('city', flat=True).distinct().order_by('city')[:6],
         'state_choices': state_choices,
         'bedroom_choices': bedroom_choices,
         'price_choices' : price_choices

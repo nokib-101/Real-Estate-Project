@@ -30,3 +30,21 @@ class AccountTests(TestCase):
 
     def test_logout_get_does_not_crash(self):
         self.assertEqual(self.client.get(reverse('logout')).status_code, 302)
+
+
+class DashboardTests(TestCase):
+    def test_dashboard_shows_inquiry_with_listing_details_and_recommendations(self):
+        from contacts.models import Contact
+        from listings.tests import make_listing, make_realtor
+        realtor = make_realtor()
+        asked = make_listing(realtor)
+        other = make_listing(realtor, title='Garden Flat')
+        user = User.objects.create_user('bob', password='x', first_name='Bob')
+        Contact.objects.create(listing=asked.title, listing_id=asked.id, name='Bob', email='b@b.test',
+                               phone='', message='Still available?', user_id=user.id)
+        self.client.force_login(user)
+        response = self.client.get(reverse('dashboard'))
+        self.assertContains(response, 'Hi, Bob')
+        self.assertContains(response, 'Sent to Jane Agent')
+        self.assertContains(response, '"Still available?"')
+        self.assertEqual(list(response.context['recommended']), [other])

@@ -1,98 +1,38 @@
-{% load static %}
-
-
-<!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
-    <div class="container">
-      <a class="navbar-brand" href="{% url 'index'%}">
-        <img src="{% static 'img/logo.png' %}" class="logo" alt="">
-      </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <ul class="navbar-nav">
-          <li
-            {% if '/' == request.path %}
-              class ="nav-item activate mr-3"
-            {% else %}
-              class = "nav-item mr-3"
-            {% endif %}
-           >
-            <a class="nav-link" href="{% url 'index'%}">Home</a>
+{% with path=request.path %}
+<nav class="navbar navbar-expand-lg site-nav">
+  <div class="container">
+    <a class="brand" href="{% url 'index' %}">
+      <span class="brand-mark"><i class="fas fa-home"></i></span> BT Real Estate
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+            aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="fas fa-bars fa-lg text-ink"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-lg-4 me-auto">
+        <li class="nav-item"><a class="nav-link {% if path == '/' %}active{% endif %}" href="{% url 'index' %}">Home</a></li>
+        <li class="nav-item"><a class="nav-link {% if '/listings' in path %}active{% endif %}" href="{% url 'listings' %}">Listings</a></li>
+        <li class="nav-item"><a class="nav-link {% if '/about' in path %}active{% endif %}" href="{% url 'about' %}">About</a></li>
+      </ul>
+      <ul class="navbar-nav align-items-lg-center gap-lg-1">
+        {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link user-chip {% if 'dashboard' in path %}active{% endif %}" href="{% url 'dashboard' %}">
+              <span class="avatar">{{ user.first_name|default:user.username|first|upper }}</span> Dashboard
+            </a>
           </li>
-          <li
-            {% if 'about' in request.path %}
-              class ="nav-item activate mr-3"
-            {% else %}
-              class = "nav-item mr-3"
-            {% endif %}
-           >
-            <a class="nav-link" href="{% url 'about'%}">About</a>
-          </li>
-
-          <li
-            {% if 'listings' in request.path %}
-              class ="nav-item activate mr-3"
-            {% else %}
-              class = "nav-item mr-3"
-            {% endif %}
-            >
-            <a class="nav-link" href="{% url 'listings' %}">Featured Listings</a>
-          </li>
-        </ul>
-
-        <ul class="navbar-nav ml-auto">
-          {% if user.is_authenticated %}
-            <li
-              {% if 'dashboard' in request.path %}
-                class ="nav-item active mr-3"
-              {% else %}
-                class = "nav-item mr-3"
-              {% endif %}
-            >
-              <a class="nav-link" href="{% url 'dashboard' %}">
-               {{ user.username }} </a>
-            </li>
-            <li class="nav-item mr-3">
-              <a href="javascript:{document.getElementById('logout').submit()}"
-              class="nav-link">
-                <i class="fas fa-sign-out-alt"></i> Logout 
-              </a>
-              <form action= "{% url 'logout' %}" method = "POST" id="logout">
+          <li class="nav-item">
+            <form action="{% url 'logout' %}" method="POST" class="m-0">
               {% csrf_token %}
-              <input type = "hidden">
-              </form>
-
-            
-            </li>
-
-          {% else %}
-            <li
-              {% if 'register' in request.path %}
-                class ="nav-item activate mr-3"
-              {% else %}
-                class = "nav-item mr-3"
-              {% endif %}
-            >
-              <a class="nav-link" href="{% url 'register' %}">
-                <i class="fas fa-user-plus"></i> Register</a>
-            </li>
-            <li
-              {% if 'login' in request.path %}
-                class ="nav-item activate mr-3"
-              {% else %}
-                class = "nav-item mr-3"
-              {% endif %}
-            >
-              <a class="nav-link" href="{% url 'login' %}">
-                <i class="fas fa-sign-in-alt"></i>
-
-                Login</a>
-            </li>
-          {% endif %}
-        </ul>
-      </div>
+              <button type="submit" class="nav-link border-0 bg-transparent"><i class="fas fa-sign-out-alt me-1"></i> Log out</button>
+            </form>
+          </li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link {% if 'login' in path %}active{% endif %}" href="{% url 'login' %}">Log in</a></li>
+          <li class="nav-item"><a class="btn btn-primary ms-lg-2" href="{% url 'register' %}">Sign up</a></li>
+        {% endif %}
+      </ul>
     </div>
-  </nav>
-
+  </div>
+</nav>
+{% endwith %}

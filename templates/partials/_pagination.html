@@ -1,0 +1,24 @@
+{# Pagination for a Page object `listings`; keeps the other query parameters. #}
+{% if listings.has_other_pages %}
+<nav class="mt-5 d-flex justify-content-center" aria-label="Listing pages">
+  <ul class="pagination flex-wrap">
+    {% if listings.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page={{ listings.previous_page_number }}" aria-label="Previous"><i class="fas fa-chevron-left"></i></a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-left"></i></span></li>
+    {% endif %}
+    {% for i in listings.paginator.page_range %}
+      {% if listings.number == i %}
+        <li class="page-item active" aria-current="page"><span class="page-link">{{ i }}</span></li>
+      {% else %}
+        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if listings.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ listings.next_page_number }}" aria-label="Next"><i class="fas fa-chevron-right"></i></a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-right"></i></span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
